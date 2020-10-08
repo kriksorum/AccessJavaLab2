@@ -13,7 +13,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import sample.DateTime;
 import sample.User;
+import sample.auditlog.Audit;
 import sample.database.DatabaseHandler;
 
 public class Controller {
@@ -46,12 +48,12 @@ public class Controller {
             if (!loginText.equals("") && !loginPassword.equals(""))
                 loginUser(loginText, loginPassword);
             else
-                System.out.println("Error");
+                System.out.println("Поля логина и пароля пустые");
         });
 
 
         regSingInButton.setOnAction(event -> {
-            openNewScene("/sample/views/SingUp.fxml");
+            openNewScene("/sample/views/SingUp.fxml", null);
         });
 
     }
@@ -75,14 +77,16 @@ public class Controller {
         }
 
         if (counter >= 1){
-            openNewScene("/sample/views/UserScene.fxml");
-            System.out.println("Success");
+            System.out.println("Пользователь " + user.getUsername() + " вошел в систему");
+
+            Audit.writeFile(DateTime.currentDate() + " Пользователь " + user.getUsername() + " вошел в систему");
+            openNewScene("/sample/views/UserScene.fxml", user);
         } else {
-            System.out.println("Error");
+            System.out.println("Неправильно введен логин или пароль");
         }
     }
 
-    public void openNewScene(String window){
+    public void openNewScene(String window, User user){
         regSingInButton.getScene().getWindow().hide();
 
         FXMLLoader loader = new FXMLLoader();
@@ -95,6 +99,8 @@ public class Controller {
         }
 
         Parent root = loader.getRoot();
+        UserSceneController usc = loader.<UserSceneController>getController();
+        usc.setUser(user);
         Stage stage = new Stage();
         stage.setScene(new Scene(root));
         stage.showAndWait();

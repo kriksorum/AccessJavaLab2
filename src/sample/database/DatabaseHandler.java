@@ -1,6 +1,8 @@
 package sample.database;
 
+import sample.DateTime;
 import sample.User;
+import sample.auditlog.Audit;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -32,7 +34,8 @@ public class DatabaseHandler extends Configs{
             prSt.setString(2, user.getPassword());
 
             prSt.executeUpdate();
-            System.out.println("Success");
+            System.out.println("Пользователь " + user.getUsername() + " зарегистрировался в системе");
+            Audit.writeFile(DateTime.currentDate() + " Пользователь " + user.getUsername() + " зарегистрировался в системе");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } catch (ClassNotFoundException e) {

@@ -39,6 +39,8 @@ public class SingUpController {
 
     @FXML
     void initialize() {
+
+
         regSingUpButton.setOnAction(event -> {
             signUpNewUser();
         });
@@ -88,4 +90,6 @@ public class SingUpController {
         stage.setScene(new Scene(root));
         stage.show();
     }
+
+
 }
