@@ -18,7 +18,7 @@ public class Main extends Application {
         primaryStage.show();
 
         System.out.println("Application run");
-        Audit.writeFile( DateTime.currentDate() + " Application run");
+        Audit.writeFile( DateTime.currentDateToStr() + " Application run");
     }
 
 

@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -60,12 +61,22 @@ public class SingUpController {
         User user = new User(username, password);
 
         if (passField.getText().trim().equals(rePassField.getText().trim())){
-            if (!dbHandler.checkUsers(username)){
-                dbHandler.signUpUser(user);
+            if (!dbHandler.checkUsers(user)){
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Information Dialog");
+                alert.setHeaderText(null);
+                if(dbHandler.signUpUser(user)){
+                    alert.setContentText("Ваш аккаунт " + user.getUsername() + " успешно зарегистрирован!");
+                } else {
+                    alert.setContentText("C регистрицией что то пошло не так!");
+                }
+                alert.showAndWait();
+                loginField.setText("");
+                passField.setText("");
+                rePassField.setText("");
             } else {
                 System.out.println("такой логин уже есть");
             }
-
 
         }
         else {
@@ -89,6 +100,10 @@ public class SingUpController {
         Stage stage = new Stage();
         stage.setScene(new Scene(root));
         stage.show();
+    }
+
+    public void setUser(User user){
+
     }
 
 

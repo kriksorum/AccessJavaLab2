@@ -2,6 +2,7 @@ package sample.controllers;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javafx.application.Platform;
@@ -9,13 +10,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import sample.DateTime;
 import sample.User;
 import sample.auditlog.Audit;
+import sample.database.DatabaseHandler;
 
 public class UserSceneController {
 
@@ -31,7 +31,7 @@ public class UserSceneController {
     private Button logOutButton;
 
     @FXML
-    private Button userFormbutton;
+    private Button changePasswordButton;
 
     @FXML
     private ProgressBar progressbar;
@@ -39,13 +39,28 @@ public class UserSceneController {
     @FXML
     private Label label1;
 
+    @FXML
+    private PasswordField rePasswordField;
+
+    @FXML
+    private Button cancelButton;
+
+    @FXML
+    private Button applyButton;
+
+    @FXML
+    private Button delUserButton;
+
+    @FXML
+    private PasswordField passwordField;
+
 
     @FXML
     void initialize() {
 
         logOutButton.setOnAction(event -> {
             System.out.println("Пользователь " + user.getUsername() + " вышел из системы");
-            Audit.writeFile(DateTime.currentDate() + " Пользователь " + user.getUsername() + " вышел из системы");
+            Audit.writeFile(DateTime.currentDateToStr() + " Пользователь " + user.getUsername() + " вышел из системы");
             openNewScene("/sample/views/SingIn.fxml");
         });
 
@@ -54,10 +69,10 @@ public class UserSceneController {
         new Thread(() -> {
             while (progressbar.getProgress() <= 1.0){
                 try {
-                    Thread.sleep(1000);
-                    if (progressbar.getProgress() >= 0.9){
+                    Thread.sleep(2000);
+                    if (progressbar.getProgress() >= 0.99){
                         System.out.println("Пользователь " + user.getUsername() + " вышел из системы");
-                        Audit.writeFile(DateTime.currentDate() + " Пользователь " + user.getUsername() + " вышел из системы");
+                        Audit.writeFile(DateTime.currentDateToStr() + " Пользователь " + user.getUsername() + " вышел из системы из за бездействий");
                         Platform.runLater(() -> openNewScene("/sample/views/SingIn.fxml"));
                     }
                 } catch (InterruptedException e) {
@@ -69,9 +84,57 @@ public class UserSceneController {
         }).start();
 
 
-        userFormbutton.setOnAction(event -> {
+        changePasswordButton.setOnAction(event -> {
+            passwordField.setVisible(true);
+            rePasswordField.setVisible(true);
+            applyButton.setVisible(true);
+            cancelButton.setVisible(true);
             progressbar.setProgress(0);
         });
+
+        cancelButton.setOnAction(event -> {
+            passwordField.setVisible(false);
+            rePasswordField.setVisible(false);
+            applyButton.setVisible(false);
+            cancelButton.setVisible(false);
+            progressbar.setProgress(0);
+        });
+
+        applyButton.setOnAction(event -> {
+            progressbar.setProgress(0);
+            DatabaseHandler dbHandler = new DatabaseHandler();
+
+            String password = passwordField.getText().trim();
+            String repassword = rePasswordField.getText().trim();
+
+            if (password.equals(repassword)){
+                user.setPassword(password);
+                dbHandler.changePass(user);
+            }
+            else {
+                System.out.println("password do not match");
+            }
+        });
+
+        delUserButton.setOnAction(event -> {
+            progressbar.setProgress(0);
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Подтверждение удаления!");
+            alert.setHeaderText("Удаление аккаунта");
+            alert.setContentText("Для подтверждения нажмите 'ОК'");
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK){
+                // ... user chose OK
+                DatabaseHandler dbHandler = new DatabaseHandler();
+                dbHandler.deleteUser(user.getUsername());
+                System.out.println("Удаление");
+            } else {
+                // ... user chose CANCEL or closed the dialog
+                System.out.println("Не удаление");
+            }
+        });
+
 
     }
 

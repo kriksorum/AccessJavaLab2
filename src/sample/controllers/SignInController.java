@@ -18,7 +18,10 @@ import sample.User;
 import sample.auditlog.Audit;
 import sample.database.DatabaseHandler;
 
-public class Controller {
+public class SignInController {
+
+    private int count = 0;
+    private String tmpusername;
 
     @FXML
     private ResourceBundle resources;
@@ -77,12 +80,45 @@ public class Controller {
         }
 
         if (counter >= 1){
-            System.out.println("Пользователь " + user.getUsername() + " вошел в систему");
+            if (dbHandler.checkBan(user)) {
+                count = 0;
+                System.out.println("Пользователь " + user.getUsername() + " вошел в систему");
+                Audit.writeFile(DateTime.currentDateToStr() + " Пользователь " + user.getUsername() + " вошел в систему");
+                if (dbHandler.getUserRole(user).equals("admin")){
+                    user.setRole("admin");
+                    openNewScene("/sample/views/AdminScene.fxml", user);
+                } else {
+                    user.setRole("user");
+                    openNewScene("/sample/views/UserScene.fxml", user);
+                }
 
-            Audit.writeFile(DateTime.currentDate() + " Пользователь " + user.getUsername() + " вошел в систему");
-            openNewScene("/sample/views/UserScene.fxml", user);
+            } else {
+                System.out.println("Пользователь " + user.getUsername() + " заблокирован");
+            }
+
         } else {
             System.out.println("Неправильно введен логин или пароль");
+            if (dbHandler.checkUsers(user)){
+                if (count == 0){
+                    count++;
+                    System.out.println("count for " + user.getUsername() + " " + count);
+                    tmpusername = user.getUsername();
+                } else {
+                    if (tmpusername.equals(user.getUsername())){
+                        count++;
+                        System.out.println("count for " + user.getUsername() + " " + count);
+                        if (count == 3){
+                            //System.out.println("blocked " + loginText);
+                            dbHandler.banUser(user);
+                        }
+                    } else {
+                        count = 0;
+                    }
+                }
+            } else {
+                count = 0;
+            }
+
         }
     }
 
@@ -99,8 +135,16 @@ public class Controller {
         }
 
         Parent root = loader.getRoot();
-        UserSceneController usc = loader.<UserSceneController>getController();
-        usc.setUser(user);
+        if (user != null){
+            if (user.getRole().equals("admin")){
+                AdminSceneController adc = loader.<AdminSceneController>getController();
+                adc.setUser(user);
+            } else {
+                UserSceneController usc = loader.<UserSceneController>getController();
+                usc.setUser(user);
+            }
+        }
+
         Stage stage = new Stage();
         stage.setScene(new Scene(root));
         stage.showAndWait();
