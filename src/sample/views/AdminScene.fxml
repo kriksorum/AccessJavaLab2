@@ -4,7 +4,6 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.controllers.AdminSceneController">
    <children>
       <ListView fx:id="listView" layoutX="14.0" layoutY="14.0" prefHeight="378.0" prefWidth="419.0" />
@@ -13,5 +12,6 @@
       <Button fx:id="listUserButton" layoutX="448.0" layoutY="167.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="138.0" text="Список пользователей" />
       <Button fx:id="zipAuditButton" layoutX="446.0" layoutY="48.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="142.0" text="Архивировать журнал" />
       <Button fx:id="deleteUserButton" layoutX="448.0" layoutY="203.0" mnemonicParsing="false" text="Удалить пользователя" visible="false" />
+      <Button fx:id="unZipButton" layoutX="446.0" layoutY="86.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="142.0" text="Открыть архив" />
    </children>
 </AnchorPane>

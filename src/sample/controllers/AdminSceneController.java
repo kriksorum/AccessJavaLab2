@@ -1,9 +1,11 @@
 package sample.controllers;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.zip.ZipEntry;
 
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -46,7 +48,7 @@ public class AdminSceneController {
     private Button deleteUserButton;
 
     @FXML
-    private Button setAdminButton;
+    private Button unZipButton;
 
     @FXML
     void initialize() {
@@ -59,7 +61,7 @@ public class AdminSceneController {
 
         openAuditButton.setOnAction(event -> {
             listView.getItems().clear();
-            listView.getItems().addAll(Audit.readFile());
+            listView.getItems().addAll(Audit.readFile("auditlog.txt"));
             deleteUserButton.setVisible(false);
         });
 
@@ -71,6 +73,8 @@ public class AdminSceneController {
             deleteUserButton.setVisible(true);
 
         });
+
+
 
 
 
@@ -100,6 +104,38 @@ public class AdminSceneController {
 
         });
 
+        zipAuditButton.setOnAction(event -> {
+            deleteUserButton.setVisible(false);
+            TextInputDialog dialog = new TextInputDialog("");
+            dialog.setTitle("Архивация");
+            dialog.setHeaderText("Внимание! При ахривации текущий журнал будет очищен!");
+            dialog.setContentText("Введите имя для архива:");
+
+            // Traditional way to get the response value.
+            Optional<String> result = dialog.showAndWait();
+            if (result.isPresent()){
+                Audit.zipAudit(result.get());
+                Audit.cleanAudit();
+                Audit.writeFile(DateTime.currentDateToStr() + " Журнал очищен");
+            }
+        });
+
+        unZipButton.setOnAction(event -> {
+            deleteUserButton.setVisible(false);
+            TextInputDialog dialog = new TextInputDialog("");
+            dialog.setTitle("Распаковка");
+            dialog.setContentText("Введите имя архива:");
+
+            // Traditional way to get the response value.
+            Optional<String> result = dialog.showAndWait();
+            if (result.isPresent()){
+                Audit.unZip(result.get());
+                listView.getItems().clear();
+                listView.getItems().addAll(Audit.readFile("unzip/auditlog.txt"));
+                Audit.deleteFile();
+            }
+        });
+
     }
 
     public void openNewScene(String window){
@@ -119,6 +155,8 @@ public class AdminSceneController {
         stage.setScene(new Scene(root));
         stage.show();
     }
+
+
 
     public void setUser(User user){
         this.user = user;
