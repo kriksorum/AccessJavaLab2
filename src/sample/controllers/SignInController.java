@@ -15,6 +15,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import sample.DateTime;
 import sample.User;
+import sample.animations.Shake;
 import sample.auditlog.Audit;
 import sample.database.DatabaseHandler;
 
@@ -47,11 +48,24 @@ public class SignInController {
         loginSingInButton.setOnAction(event -> {
             String loginText = loginField.getText().trim();
             String loginPassword = passField.getText().trim();
+            Shake userLoginAnim = new Shake(loginField);
+            Shake userPassAnim = new Shake(passField);
 
-            if (!loginText.equals("") && !loginPassword.equals(""))
-                loginUser(loginText, loginPassword);
-            else
+
+            if (loginText.equals("")  && loginPassword.equals("")){
                 System.out.println("Поля логина и пароля пустые");
+                userLoginAnim.playAnim();
+                userPassAnim.playAnim();
+            }
+            else if (loginText.equals("")){
+                System.out.println("Поле логина пустое");
+                userLoginAnim.playAnim();
+            }
+            else if (loginPassword.equals("")){
+                System.out.println("Поле пароля пустое");
+                userPassAnim.playAnim();
+            }
+            else loginUser(loginText, loginPassword);
         });
 
 
@@ -98,6 +112,10 @@ public class SignInController {
 
         } else {
             System.out.println("Неправильно введен логин или пароль");
+            Shake userLoginAnim = new Shake(loginField);
+            Shake userPassAnim = new Shake(passField);
+            userLoginAnim.playAnim();
+            userPassAnim.playAnim();
             if (dbHandler.checkUsers(user)){
                 if (count == 0){
                     count++;

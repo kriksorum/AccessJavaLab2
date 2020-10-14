@@ -1,8 +1,6 @@
 package sample.auditlog;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -81,7 +79,7 @@ public class Audit {
         writer.close();
     }
 
-    public static void unZip(String name){
+    public static boolean unZip(String name){
         String fileZip = name + ".zip";
         File destDir = new File("E:/arsalan/esstu/ProtectInfo/testAccess/unzip");
         byte[]buffer = new byte[1024];
@@ -103,10 +101,12 @@ public class Audit {
             zis.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            return false;
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
-
+        return true;
 
     }
 

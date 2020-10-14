@@ -1,13 +1,10 @@
 package sample.controllers;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.zip.ZipEntry;
 
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -79,29 +76,39 @@ public class AdminSceneController {
 
 
         deleteUserButton.setOnAction(event -> {
+
             String selectedItems = listView.getSelectionModel().getSelectedItems().toString();
-            selectedItems = selectedItems.substring(1, selectedItems.length() - 1);
-            if (selectedItems.contains(" ")){
-                selectedItems = selectedItems.substring(0, selectedItems.indexOf(" "));
-            }
-            System.out.println(selectedItems);
+            if (!selectedItems.equals("[]")) {
+                selectedItems = selectedItems.substring(1, selectedItems.length() - 1);
+                if (selectedItems.contains(" ")) {
+                    selectedItems = selectedItems.substring(0, selectedItems.indexOf(" "));
+                }
+                System.out.println(selectedItems);
 
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Подтверждение удаления!");
-            alert.setHeaderText("Удаление аккаунта");
-            alert.setContentText("Для подтверждения нажмите 'ОК'");
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Подтверждение удаления!");
+                alert.setHeaderText("Удаление аккаунта");
+                alert.setContentText("Для подтверждения нажмите 'ОК'");
 
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == ButtonType.OK){
-                // ... user chose OK
-                DatabaseHandler dbHandler = new DatabaseHandler();
-                dbHandler.deleteUser(selectedItems);
-                System.out.println("Удаление");
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK) {
+                    // ... user chose OK
+                    DatabaseHandler dbHandler = new DatabaseHandler();
+                    dbHandler.deleteUser(selectedItems);
+                    System.out.println("Удаление");
+                } else {
+                    // ... user chose CANCEL or closed the dialog
+                    System.out.println("Не удаление");
+                }
             } else {
-                // ... user chose CANCEL or closed the dialog
-                System.out.println("Не удаление");
-            }
+                System.out.println("Выберите пользователя");
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Warning Dialog");
+                alert.setHeaderText(null);
+                alert.setContentText("Не выбран пользователь для удаления!");
 
+                alert.showAndWait();
+            }
         });
 
         zipAuditButton.setOnAction(event -> {
@@ -129,10 +136,19 @@ public class AdminSceneController {
             // Traditional way to get the response value.
             Optional<String> result = dialog.showAndWait();
             if (result.isPresent()){
-                Audit.unZip(result.get());
-                listView.getItems().clear();
-                listView.getItems().addAll(Audit.readFile("unzip/auditlog.txt"));
-                Audit.deleteFile();
+                if (Audit.unZip(result.get())){
+                    listView.getItems().clear();
+                    listView.getItems().addAll(Audit.readFile("unzip/auditlog.txt"));
+                    Audit.deleteFile();
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error Dialog");
+                    alert.setHeaderText("Файл не найден!");
+                    alert.setContentText(null);
+
+                    alert.showAndWait();
+                }
+
             }
         });
 

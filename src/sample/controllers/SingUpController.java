@@ -13,6 +13,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import sample.User;
+import sample.animations.Shake;
 import sample.database.DatabaseHandler;
 
 public class SingUpController {
@@ -59,6 +60,9 @@ public class SingUpController {
         String password = passField.getText().trim();
 
         User user = new User(username, password);
+        Shake userLoginAnim = new Shake(loginField);
+        Shake userPassAnim = new Shake(passField);
+        Shake userRePassAnim = new Shake(rePassField);
 
         if (passField.getText().trim().equals(rePassField.getText().trim())){
             if (!dbHandler.checkUsers(user)){
@@ -76,11 +80,15 @@ public class SingUpController {
                 rePassField.setText("");
             } else {
                 System.out.println("такой логин уже есть");
+                userLoginAnim.playAnim();
             }
 
         }
         else {
             System.out.println("Not equals");
+            userPassAnim.playAnim();
+            userRePassAnim.playAnim();
+
         }
     }
 
