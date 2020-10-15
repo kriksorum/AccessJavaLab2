@@ -14,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import sample.DateTime;
 import sample.User;
+import sample.animations.Shake;
 import sample.auditlog.Audit;
 import sample.database.DatabaseHandler;
 
@@ -113,6 +114,10 @@ public class UserSceneController {
             }
             else {
                 System.out.println("password do not match");
+                Shake userPassAnim = new Shake(passwordField);
+                Shake userRePassAnim = new Shake(rePasswordField);
+                userPassAnim.playAnim();
+                userRePassAnim.playAnim();
             }
         });
 
@@ -128,6 +133,7 @@ public class UserSceneController {
                 // ... user chose OK
                 DatabaseHandler dbHandler = new DatabaseHandler();
                 dbHandler.deleteUser(user.getUsername());
+                openNewScene("/sample/views/SingIn.fxml");
                 System.out.println("Удаление");
             } else {
                 // ... user chose CANCEL or closed the dialog

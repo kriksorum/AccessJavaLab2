@@ -3,6 +3,7 @@ package sample.database;
 import sample.DateTime;
 import sample.User;
 import sample.auditlog.Audit;
+import sample.crypt.CryptDES;
 
 import java.sql.*;
 import java.text.ParseException;
@@ -33,7 +34,7 @@ public class DatabaseHandler extends Configs {
         try {
             PreparedStatement prSt = getDbConnection().prepareStatement(insert);
             prSt.setString(1, user.getUsername());
-            prSt.setString(2, user.getPassword());
+            prSt.setString(2, CryptDES.encrypt(user.getPassword()));
             prSt.setString(3, DateTime.currentDateToStr());
             prSt.setString(4, "user");
 
@@ -58,7 +59,7 @@ public class DatabaseHandler extends Configs {
         try {
             PreparedStatement prSt = getDbConnection().prepareStatement(select);
             prSt.setString(1, user.getUsername());
-            prSt.setString(2, user.getPassword());
+            prSt.setString(2, CryptDES.encrypt(user.getPassword()));
 
             resSet = prSt.executeQuery();
 
@@ -102,7 +103,7 @@ public class DatabaseHandler extends Configs {
 
         try {
             PreparedStatement prSt = getDbConnection().prepareStatement(update);
-            prSt.setString(1, user.getPassword());
+            prSt.setString(1, CryptDES.encrypt(user.getPassword()));
             prSt.setString(2, user.getUsername());
 
             prSt.executeUpdate();
@@ -134,11 +135,11 @@ public class DatabaseHandler extends Configs {
 
             SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
             Date date = formatter.parse(dateStr);
-            if (date.getTime() > DateTime.currentDate()) {
-                //System.out.println("blocked");
+            if (date.getTime() < DateTime.currentDate()) {
+                System.out.println("blocked");
                 flag = false;
             } else {
-                //System.out.println("unblocked");
+                System.out.println("unblocked");
                 flag = true;
             }
 

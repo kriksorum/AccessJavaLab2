@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -108,6 +109,12 @@ public class SignInController {
 
             } else {
                 System.out.println("Пользователь " + user.getUsername() + " заблокирован");
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Warning Dialog");
+                alert.setHeaderText("Пользователь " + user.getUsername() + " заблокирован");
+                alert.setContentText(null);
+
+                alert.showAndWait();
             }
 
         } else {
@@ -128,6 +135,12 @@ public class SignInController {
                         if (count == 3){
                             //System.out.println("blocked " + loginText);
                             dbHandler.banUser(user);
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Warning Dialog");
+                            alert.setHeaderText("Ваш аккаунт заблокирован на 2 минуты");
+                            alert.setContentText(null);
+
+                            alert.showAndWait();
                         }
                     } else {
                         count = 0;
